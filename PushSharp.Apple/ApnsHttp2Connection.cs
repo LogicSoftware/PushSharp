@@ -7,6 +7,7 @@ using System.Text;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Net.Http;
 
 namespace PushSharp.Apple
 {
@@ -45,13 +46,17 @@ namespace PushSharp.Apple
             if (certificate != null)
                 certificates.Add (certificate);
 
-            var http2Settings = new HttpTwo.Http2ConnectionSettings (
-                Configuration.Host,
-               (uint)Configuration.Port, 
-                true, 
-                certificates);
+            var handler = new WinHttpHandler();
+            handler.ServerCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+            handler.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
             
-            http2 = new HttpTwo.Http2Client (http2Settings);
+            foreach (X509Certificate cert in certificates)
+            {
+                if (cert is X509Certificate2 cert2)
+                    handler.ClientCertificates.Add(cert2);
+            }
+
+            httpClient = new HttpClient(handler);
         }
 
         public ApnsHttp2Configuration Configuration { get; private set; }
@@ -59,54 +64,67 @@ namespace PushSharp.Apple
         X509CertificateCollection certificates;
         X509Certificate2 certificate;
         int id = 0;
-        HttpTwo.Http2Client http2;
+        HttpClient httpClient;
 
         public async Task Send (ApnsHttp2Notification notification)
         {
             var url = string.Format ("https://{0}:{1}/3/device/{2}", 
                           Configuration.Host,
                           Configuration.Port,
-                          notification.DeviceToken);            
-            var uri = new Uri (url);
+                          notification.DeviceToken);
 
             var payload = notification.Payload.ToString ();
 
-            var data = Encoding.ASCII.GetBytes (payload);
+            var request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Version = new Version(2, 0);
+            request.Content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-            var headers = new NameValueCollection ();
-            headers.Add ("apns-id", notification.Uuid); // UUID
+            request.Headers.Add("apns-id", notification.Uuid);
+
+            if((string.IsNullOrEmpty(notification.PushType)))
+            {
+                notification.PushType = "background";
+            }
+            request.Headers.Add("apns-push-type", notification.PushType);
 
             if (notification.Expiration.HasValue) {
                 var sinceEpoch = notification.Expiration.Value.ToUniversalTime () - new DateTime (1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
                 var secondsSinceEpoch = (long)sinceEpoch.TotalSeconds;
-                headers.Add ("apns-expiration", secondsSinceEpoch.ToString ()); //Epoch in seconds
+                request.Headers.Add ("apns-expiration", secondsSinceEpoch.ToString ());
             }
 
             if (notification.Priority.HasValue)
-                headers.Add ("apns-priority", notification.Priority == ApnsPriority.Low ? "5" : "10"); // 5 or 10
-
-            headers.Add ("content-length", data.Length.ToString ());
+                request.Headers.Add ("apns-priority", notification.Priority == ApnsPriority.Low ? "5" : "10");
 
             if (!string.IsNullOrEmpty (notification.Topic)) 
-                headers.Add ("apns-topic", notification.Topic); // string topic
+                request.Headers.Add ("apns-topic", notification.Topic);
 
-            var response = await http2.Post (uri, headers, data);
-            
-            if (response.Status == HttpStatusCode.OK) {
-                // Check for matching uuid's
-                var responseUuid = response.Headers ["apns-id"];
-                if (responseUuid != notification.Uuid)
-                    throw new Exception ("Mismatched APNS-ID header values");
+            HttpResponseMessage response;
+            try
+            {
+                response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            if (response.StatusCode == HttpStatusCode.OK) {
+                if (response.Headers.Contains("apns-id"))
+                {
+                    var responseUuid = response.Headers.GetValues("apns-id").FirstOrDefault();
+                    if (responseUuid != notification.Uuid)
+                        throw new Exception ("Mismatched APNS-ID header values");
+                }
             } else {
-                // Try parsing json body
                 var json = new JObject ();
 
-                if (response.Body != null && response.Body.Length > 0) {
-                    var body = Encoding.ASCII.GetString (response.Body);
-                    json = JObject.Parse (body);
+                var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(responseBody)) {
+                    json = JObject.Parse (responseBody);
                 }
 
-                if (response.Status == HttpStatusCode.Gone) {
+                if (response.StatusCode == HttpStatusCode.Gone) {
 
                     var timestamp = DateTime.UtcNow;
                     if (json != null && json["timestamp"] != null) {
@@ -114,20 +132,16 @@ namespace PushSharp.Apple
                         timestamp = new DateTime (1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds (sinceEpoch);
                     }
 
-                    // Expired
-                    throw new PushSharp.Core.DeviceSubscriptonExpiredException {
+                    throw new PushSharp.Core.DeviceSubscriptionExpiredException (notification) {
                         OldSubscriptionId = notification.DeviceToken,
                         NewSubscriptionId = null,
                         ExpiredAt = timestamp
                     };
                 }
 
-                // Get the reason
                 var reasonStr = json.Value<string> ("reason");
 
-                var reason = (ApnsHttp2FailureReason)Enum.Parse (typeof (ApnsHttp2FailureReason), reasonStr, true);
-
-                throw new ApnsHttp2NotificationException (reason, notification);
+                throw new Exception("Http2: " + reasonStr);
             }
         }
     }

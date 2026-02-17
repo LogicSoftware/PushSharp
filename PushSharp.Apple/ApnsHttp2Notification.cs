@@ -22,6 +22,12 @@ namespace PushSharp.Apple
         public string Uuid { get; set; }
 
         /// <summary>
+        /// apns-push-type
+        /// </summary>
+        /// <value>background or alert</value>
+        public string PushType { get; set; }
+
+        /// <summary>
         /// Device Token to send notifications to
         /// </summary>
         /// <value>The device token.</value>

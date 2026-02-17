@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using NUnit.Framework;
 using PushSharp.Apple;
 using Newtonsoft.Json.Linq;
@@ -16,8 +18,8 @@ namespace PushSharp.Tests
             var failed = 0;
             var attempted = 0;
 
-            var config = new ApnsConfiguration (ApnsConfiguration.ApnsServerEnvironment.Sandbox, Settings.Instance.ApnsCertificateFile, Settings.Instance.ApnsCertificatePassword);
-            var broker = new ApnsServiceBroker (config);
+            var config = new ApnsHttp2Configuration (ApnsHttp2Configuration.ApnsServerEnvironment.Production, FindByThumbprint("BB80CA965848CE009580C64317E592CDC9C29F3D"));
+            var broker = new ApnsHttp2ServiceBroker (config);
             broker.OnNotificationFailed += (notification, exception) => {
                 failed++;
             };
@@ -26,11 +28,43 @@ namespace PushSharp.Tests
             };
             broker.Start ();
 
-            foreach (var dt in Settings.Instance.ApnsDeviceTokens) {
+            IEnumerable<string> deviceTokens =
+            [
+                "2a3c7aeeb200ed16be48f8c743dde0a1eaddea4f5c7c6eb12fbfea1dd44ac161",
+                "2a3c7aeeb200ed16be48f8c743dde0a1eaddea4f5c7c6eb12fbfea1dd44ac161"
+            ];
+            foreach (var dt in deviceTokens) {
                 attempted++;
-                broker.QueueNotification (new ApnsNotification {
+                broker.QueueNotification (new ApnsHttp2Notification {
                     DeviceToken = dt,
-                    Payload = JObject.Parse ("{ \"aps\" : { \"alert\" : \"Hello PushSharp!\" } }")
+                    Topic = "net.logicsoftware.easyprojects",
+                    Payload = JObject.Parse (
+                        """
+                        {
+                          "aps": {
+                            "content-available": 1,
+                            "sound": "default",
+                            "alert": {
+                              "title": "tyrtyrt",
+                              "loc-key": "Notification.TaskMessageAdded.Body",
+                              "loc-args": [
+                                "Natalia Romashevskaya",
+                                "@Administrator rtyrtyrtyrtyrty"
+                              ]
+                            }
+                          },
+                          "data": {
+                            "Type": "TaskMessageAdded",
+                            "FeedId": 5813066,
+                            "TaskId": 3900,
+                            "TaskName": "tyrtyrt",
+                            "MessageId": 5855812,
+                            "MessageText": "@Administrator rtyrtyrtyrtyrty",
+                            "PostedByUserId": 112,
+                            "PostedByUserName": "Natalia Romashevskaya"
+                          }
+                        }
+                        """)
                 });
             }
 
@@ -54,6 +88,38 @@ namespace PushSharp.Tests
                 // timestamp is the time the token was reported as expired
             };
             fbs.Check ();
+        }
+        
+        private static X509Certificate2 FindByThumbprint(string thumbprint)
+        {
+            if (string.IsNullOrWhiteSpace(thumbprint))
+            {
+                throw new ArgumentNullException(nameof(thumbprint));
+            }
+
+            X509Store certStore = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            certStore.Open(OpenFlags.ReadOnly);
+
+            try
+            {
+                X509Certificate2Collection certCollection = certStore.Certificates.Find(
+                    X509FindType.FindByThumbprint,
+                    thumbprint,
+                    false);
+
+                if (certCollection.Count > 0)
+                {
+                    return certCollection[0];
+                }
+                else
+                {
+                    throw new InvalidOperationException("Unable to find a certificate with thumbprint " + thumbprint);
+                }
+            }
+            finally
+            {
+                certStore.Close();
+            }
         }
     }
 }
