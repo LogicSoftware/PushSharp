@@ -30,14 +30,18 @@ namespace PushSharp.Tests
 
             IEnumerable<string> deviceTokens =
             [
-                "2a3c7aeeb200ed16be48f8c743dde0a1eaddea4f5c7c6eb12fbfea1dd44ac161",
-                "2a3c7aeeb200ed16be48f8c743dde0a1eaddea4f5c7c6eb12fbfea1dd44ac161"
+                "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
+                "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
+                "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
+                // "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
+                // "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
             ];
             foreach (var dt in deviceTokens) {
                 attempted++;
                 broker.QueueNotification (new ApnsHttp2Notification {
                     DeviceToken = dt,
                     Topic = "net.logicsoftware.easyprojects",
+                    PushType = "alert",
                     Payload = JObject.Parse (
                         """
                         {

@@ -99,15 +99,7 @@ namespace PushSharp.Apple
             if (!string.IsNullOrEmpty (notification.Topic)) 
                 request.Headers.Add ("apns-topic", notification.Topic);
 
-            HttpResponseMessage response;
-            try
-            {
-                response = await httpClient.SendAsync(request).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            HttpResponseMessage response = await httpClient.SendAsync(request).ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.OK) {
                 if (response.Headers.Contains("apns-id"))
@@ -123,8 +115,10 @@ namespace PushSharp.Apple
                 if (!string.IsNullOrEmpty(responseBody)) {
                     json = JObject.Parse (responseBody);
                 }
+                
+                var reason = json.Value<string> ("reason");
 
-                if (response.StatusCode == HttpStatusCode.Gone) {
+                if (response.StatusCode == HttpStatusCode.Gone || reason == "BadDeviceToken") {
 
                     var timestamp = DateTime.UtcNow;
                     if (json != null && json["timestamp"] != null) {
@@ -139,9 +133,7 @@ namespace PushSharp.Apple
                     };
                 }
 
-                var reasonStr = json.Value<string> ("reason");
-
-                throw new Exception("Http2: " + reasonStr);
+                throw new Exception("Http2: " + reason);
             }
         }
     }
