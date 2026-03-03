@@ -30,11 +30,6 @@ namespace PushSharp.Tests
 
             IEnumerable<string> deviceTokens =
             [
-                "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
-                "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
-                "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
-                // "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
-                // "e155217897df8cde740a688643b511fd8e477094efe906e7d28b018010676af8",
             ];
             foreach (var dt in deviceTokens) {
                 attempted++;
@@ -49,11 +44,11 @@ namespace PushSharp.Tests
                             "content-available": 1,
                             "sound": "default",
                             "alert": {
-                              "title": "tyrtyrt",
+                              "title": "Test title",
                               "loc-key": "Notification.TaskMessageAdded.Body",
                               "loc-args": [
-                                "Natalia Romashevskaya",
-                                "@Administrator rtyrtyrtyrtyrty"
+                                "First Last",
+                                "@Administrator message"
                               ]
                             }
                           },
@@ -61,11 +56,11 @@ namespace PushSharp.Tests
                             "Type": "TaskMessageAdded",
                             "FeedId": 5813066,
                             "TaskId": 3900,
-                            "TaskName": "tyrtyrt",
+                            "TaskName": "Task Name",
                             "MessageId": 5855812,
-                            "MessageText": "@Administrator rtyrtyrtyrtyrty",
+                            "MessageText": "@Administrator message",
                             "PostedByUserId": 112,
-                            "PostedByUserName": "Natalia Romashevskaya"
+                            "PostedByUserName": "First Last"
                           }
                         }
                         """)
