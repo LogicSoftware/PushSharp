@@ -80,8 +80,8 @@ namespace PushSharp.Apple
 
                 if (!issuerName.Contains ("Apple"))
                     throw new ApnsConnectionException ("Your Certificate does not appear to be issued by Apple!  Please check to ensure you have the correct certificate!");
-                if (!commonName.Contains ("Apple Push Services:"))
-                    throw new ApnsConnectionException ("Your Certificate is not in the new combined Sandbox/Production APNS certificate format, please create a new single certificate to use");
+                //if (!commonName.Contains ("Apple Push Services:"))
+                //    throw new ApnsConnectionException ("Your Certificate is not in the new combined Sandbox/Production APNS certificate format, please create a new single certificate to use");
 
             } else {
                 throw new ApnsConnectionException ("You must provide a Certificate to connect to APNS with!");
