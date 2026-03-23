@@ -20,7 +20,17 @@
         <tags>APN, APNS, GCM, XMPP, ADM, GCMXMPP, C2DM, PAP, BIS, BEM, Blackberry, iOS, Android, iPad, iPhone, PushSharp, MDM, UWP, WNS, Windows Notification, Amazon, Amazon Device, Push, Push Notifications, Google Cloud, Cloud Messaging, Google Cloud Messaging, OSX, Mac, WindowsPhone, PassKit</tags>
         <dependencies>
             <dependency id="Newtonsoft.Json" version="13.0.4" />
+            <dependency id="System.Buffers" version="4.5.1" />
+            <dependency id="System.Memory" version="4.5.4" />
             <dependency id="System.Net.Http.WinHttpHandler" version="4.7.2" />
+            <dependency id="System.Numerics.Vectors" version="4.5.0" />
+            <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.5.3" />
+            <dependency id="Microsoft.IdentityModel.JsonWebTokens" version="6.5.0" />
+            <dependency id="Microsoft.IdentityModel.Logging" version="6.5.0" />
+            <dependency id="Microsoft.IdentityModel.Tokens" version="6.5.0" />
+            <dependency id="Security.Cryptography" version="1.7.2" />
+            <dependency id="System.IdentityModel.Tokens.Jwt" version="6.5.0" />
+            <dependency id="WebPushEncryption" version="1.0.3" />
         </dependencies>
     </metadata>
     <files>
