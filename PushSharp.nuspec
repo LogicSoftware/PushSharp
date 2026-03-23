@@ -20,6 +20,7 @@
         <tags>APN, APNS, GCM, XMPP, ADM, GCMXMPP, C2DM, PAP, BIS, BEM, Blackberry, iOS, Android, iPad, iPhone, PushSharp, MDM, UWP, WNS, Windows Notification, Amazon, Amazon Device, Push, Push Notifications, Google Cloud, Cloud Messaging, Google Cloud Messaging, OSX, Mac, WindowsPhone, PassKit</tags>
         <dependencies>
             <dependency id="Newtonsoft.Json" version="13.0.4" />
+            <dependency id="System.Net.Http.WinHttpHandler" version="4.7.2" />
         </dependencies>
     </metadata>
     <files>
@@ -33,6 +34,6 @@
         <file src="PushSharp.Windows\bin\Release\PushSharp.Windows.dll" target="lib\net472\PushSharp.Windows.dll" />
         <file src="PushSharp.Google\bin\Release\PushSharp.Google.dll" target="lib\net472\PushSharp.Google.dll" />
         <file src="PushSharp.Web\bin\Release\PushSharp.Web.dll" target="lib\net472\PushSharp.Web.dll" />
-        <file src="PushSharp.Blackberry\bin\Release\PushSharp.Blackberry.dll" target="lib\net48\PushSharp.Blackberry.dll" />
+        <file src="PushSharp.Blackberry\bin\Release\PushSharp.Blackberry.dll" target="lib\net472\PushSharp.Blackberry.dll" />
     </files>
 </package>
