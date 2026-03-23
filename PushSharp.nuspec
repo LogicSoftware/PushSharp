@@ -19,7 +19,7 @@
         <language>en-US</language>
         <tags>APN, APNS, GCM, XMPP, ADM, GCMXMPP, C2DM, PAP, BIS, BEM, Blackberry, iOS, Android, iPad, iPhone, PushSharp, MDM, UWP, WNS, Windows Notification, Amazon, Amazon Device, Push, Push Notifications, Google Cloud, Cloud Messaging, Google Cloud Messaging, OSX, Mac, WindowsPhone, PassKit</tags>
         <dependencies>
-            <dependency id="Newtonsoft.Json" version="13.0.4" />
+            <dependency id="Newtonsoft.Json" version="13.0.3" />
             <dependency id="System.Buffers" version="4.5.1" />
             <dependency id="System.Memory" version="4.5.4" />
             <dependency id="System.Net.Http.WinHttpHandler" version="4.7.2" />
