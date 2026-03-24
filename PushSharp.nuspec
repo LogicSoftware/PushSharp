@@ -19,7 +19,18 @@
         <language>en-US</language>
         <tags>APN, APNS, GCM, XMPP, ADM, GCMXMPP, C2DM, PAP, BIS, BEM, Blackberry, iOS, Android, iPad, iPhone, PushSharp, MDM, UWP, WNS, Windows Notification, Amazon, Amazon Device, Push, Push Notifications, Google Cloud, Cloud Messaging, Google Cloud Messaging, OSX, Mac, WindowsPhone, PassKit</tags>
         <dependencies>
-            <dependency id="Newtonsoft.Json" version="13.0.4" />
+            <dependency id="Newtonsoft.Json" version="13.0.3" />
+            <dependency id="System.Buffers" version="4.5.1" />
+            <dependency id="System.Memory" version="4.5.4" />
+            <dependency id="System.Net.Http.WinHttpHandler" version="4.7.2" />
+            <dependency id="System.Numerics.Vectors" version="4.5.0" />
+            <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.5.3" />
+            <dependency id="Microsoft.IdentityModel.JsonWebTokens" version="6.5.0" />
+            <dependency id="Microsoft.IdentityModel.Logging" version="6.5.0" />
+            <dependency id="Microsoft.IdentityModel.Tokens" version="6.5.0" />
+            <dependency id="Security.Cryptography" version="1.7.2" />
+            <dependency id="System.IdentityModel.Tokens.Jwt" version="6.5.0" />
+            <dependency id="WebPushEncryption" version="1.0.3" />
         </dependencies>
     </metadata>
     <files>
@@ -33,6 +44,6 @@
         <file src="PushSharp.Windows\bin\Release\PushSharp.Windows.dll" target="lib\net472\PushSharp.Windows.dll" />
         <file src="PushSharp.Google\bin\Release\PushSharp.Google.dll" target="lib\net472\PushSharp.Google.dll" />
         <file src="PushSharp.Web\bin\Release\PushSharp.Web.dll" target="lib\net472\PushSharp.Web.dll" />
-        <file src="PushSharp.Blackberry\bin\Release\PushSharp.Blackberry.dll" target="lib\net48\PushSharp.Blackberry.dll" />
+        <file src="PushSharp.Blackberry\bin\Release\PushSharp.Blackberry.dll" target="lib\net472\PushSharp.Blackberry.dll" />
     </files>
 </package>
